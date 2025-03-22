@@ -11,13 +11,13 @@ import java.util.Map;
 
 /**
  * {@link InMemoryCache} capable of storing and retrieving key-value pairs.
- * Enabled with features and configurations including -
+ * Uses {@link CacheConfiguration} for cache properties. Enabled with following features -
  *  maxCapacity limit with LRU Eviction from the cache
  *  {@link ExpirationPolicy} to automatically remove expired items from cache
  *  {@link DataStore} backing the cache for cache miss, load during creation and refresh
  *  {@link WritePropagationPolicy} to propagate updates in cached data to the backing datastore
  *  {@link RefreshPolicy} to auto refresh cache item after a duration from the datastore
- * See Unit Tests for InMemoryCache
+ * See Unit Tests for InMemoryCache.
  * @param <K>
  * @param <V>
  */
@@ -29,19 +29,18 @@ public class InMemoryCache<K, V> implements Cache<K, V>, RefreshableCache<K, V>,
     private final RefreshPolicy<K, V> refreshPolicy;
 
     /**
-     * Constructor for InMemoryCache with config and backingDataStore as params.
+     * Constructor for InMemoryCache with {@link CacheConfiguration} as param.
      * Build the cache using config properties and datastore.
      * Setup scheduled tasks and load the cache from datastore as defined.
      * @param config
-     * @param backingDataStore
      */
-    public InMemoryCache(CacheConfiguration<K, V> config, DataStore<K, V> backingDataStore) {
+    public InMemoryCache(CacheConfiguration<K, V> config) {
         // get config properties
         this.expirationPolicy = config.getExpirationPolicy();
         this.writePropagationPolicy = config.getWritePropagationPolicy();
         this.refreshPolicy = config.getRefreshPolicy();
 
-        this.dataStore = backingDataStore;
+        this.dataStore = config.getDataStore();
         // build cache object
         this.cache = new ConcurrentLinkedHashMap.Builder<K, CacheEntry<V>>()
                 .maximumWeightedCapacity(config.getMaxCapacity())

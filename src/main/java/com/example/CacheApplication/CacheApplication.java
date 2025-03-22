@@ -20,19 +20,21 @@ public class CacheApplication {
 		final String KEY1 = "key1";
 		final String KEY2 = "key2";
 		final String KEY3 = "key3";
-		CacheConfiguration<String, String> config = CacheConfiguration.<String, String>builder()
-				.maxCapacity(2)
-				.expirationPolicy(new TimeSinceCreationExpiration<>(1000L))
-				.writePropagationPolicy(new WriteThroughPropagationPolicy<>())
-				.refreshPolicy(new FixedDurationRefreshPolicy<>(2000L))
-				.asyncLoad(false)
-				.build();
 
 		ConcurrentHashMap<String, String> datastoreMap = new ConcurrentHashMap<>();
 		datastoreMap.put(KEY1, "value0");
 		DataStore<String, String> dataStore = new InMemoryDataStore<>(datastoreMap);
 
-		InMemoryCache<String, String> cache = new InMemoryCache<>(config, dataStore);
+		CacheConfiguration<String, String> config = CacheConfiguration.<String, String>builder()
+				.maxCapacity(2)
+				.expirationPolicy(new TimeSinceCreationExpiration<>(1000L))
+				.writePropagationPolicy(new WriteThroughPropagationPolicy<>())
+				.refreshPolicy(new FixedDurationRefreshPolicy<>(2000L))
+				.dataStore(dataStore)
+				.asyncLoad(false)
+				.build();
+
+		InMemoryCache<String, String> cache = new InMemoryCache<>(config);
 
 		// Given Test case 0 - basic
 		System.out.println("Basic Get key1: " + cache.get(KEY1));

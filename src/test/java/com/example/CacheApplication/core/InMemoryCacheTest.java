@@ -36,15 +36,25 @@ public class InMemoryCacheTest {
                 .expirationPolicy(spyExpirationPolicy)
                 .writePropagationPolicy(mockWritePolicy)
                 .refreshPolicy(spyRefreshPolicy)
+                .dataStore(spyDataStore)
                 .asyncLoad(false)
                 .build();
 
-        cache = new InMemoryCache<>(config, spyDataStore);
+        cache = new InMemoryCache<>(config);
     }
 
     @AfterAll
     static void tearDown() {
         ScheduledExecutorUtil.shutdown();
+    }
+
+    @Test
+    void testInvalidCacheConfigurationThrowsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+                CacheConfiguration.<String, String>builder()
+                        .maxCapacity(0)  // Invalid max capacity
+                        .build()
+        );
     }
 
     @Test
@@ -221,10 +231,11 @@ public class InMemoryCacheTest {
                 .expirationPolicy(spyExpirationPolicy)
                 .writePropagationPolicy(mockWritePolicy)
                 .refreshPolicy(spyRefreshPolicy)
+                .dataStore(spyDataStore)
                 .asyncLoad(false)
                 .build();
 
-        InMemoryCache<String, String> newCache = new InMemoryCache<>(config, spyDataStore);
+        InMemoryCache<String, String> newCache = new InMemoryCache<>(config);
 
         assertEquals("valueA", newCache.get("keyA"));
         assertEquals("valueB", newCache.get("keyB"));
