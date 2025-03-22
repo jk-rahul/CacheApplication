@@ -20,12 +20,7 @@ public class FixedDurationRefreshPolicy<K, V> implements RefreshPolicy<K, V> {
     }
 
     @Override
-    public void refresh(K key, DataStore<K, V> dataStore, RefreshableCache<K, V> cache) {
-        cache.updateValue(key, dataStore.get(key));
-    }
-
-    @Override
-    public void scheduleAutoRefresh(RefreshableCache<K, V> cache, DataStore<K, V> dataStore) {
+    public void scheduleAutoRefresh(RefreshableCache<K, V> cache) {
         ScheduledExecutorUtil.scheduleAtFixedRate(cache.getAutoRefreshRunnable(),
                 refreshPeriodMillis, refreshPeriodMillis, TimeUnit.MILLISECONDS);
     }

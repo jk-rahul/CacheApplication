@@ -113,7 +113,7 @@ public class InMemoryCacheTest {
         Thread.sleep(300);
 
         // Verify refresh policy executed
-        verify(spyRefreshPolicy, atLeastOnce()).scheduleAutoRefresh(any(), any());
+        verify(spyRefreshPolicy, atLeastOnce()).scheduleAutoRefresh(any());
 
         // Ensure cache got the updated value
         assertEquals("updatedValue1", cache.get("key1"));

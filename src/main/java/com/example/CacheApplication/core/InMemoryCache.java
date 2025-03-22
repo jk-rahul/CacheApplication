@@ -50,7 +50,7 @@ public class InMemoryCache<K, V> implements Cache<K, V>, RefreshableCache<K, V>,
         // setup scheduled policy tasks - expiration, writePropagation, refresh
         expirationPolicy.scheduleAutoCleanup(this);
         writePropagationPolicy.scheduleWrite();
-        refreshPolicy.scheduleAutoRefresh(this, dataStore);
+        refreshPolicy.scheduleAutoRefresh(this);
 
         // load cache from data store
         if (config.isAsyncLoad()) {
@@ -129,16 +129,16 @@ public class InMemoryCache<K, V> implements Cache<K, V>, RefreshableCache<K, V>,
      */
     @Override
     public Runnable getAutoRefreshRunnable() {
-        return () -> cache.keySet().forEach(key -> refreshPolicy.refresh(key, dataStore, this));
+        return () -> cache.keySet().forEach(this::updateCacheValue);
     }
 
     /**
-     * Update cache item with newValue retrieved as per the {@link RefreshPolicy} implementation
+     * Update cache item with newValue retrieved from the {@link DataStore} implementation
      * @param key
-     * @param newValue
      */
     @Override
-    public void updateValue(K key, V newValue) {
+    public void updateCacheValue(K key) {
+        V newValue = dataStore.get(key);
         if (newValue != null) {
             cache.compute(key, (k, existingEntry) -> new CacheEntry<>(newValue));
         }
